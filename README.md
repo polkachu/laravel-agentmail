@@ -112,25 +112,25 @@ Agentmail::inboxes()->delete('inbox_abc123');
 
 All inbox operations return an `Inbox` object with the following properties:
 
-| Property | Type | Description |
-|---|---|---|
-| `$inboxId` | `string` | Unique inbox identifier |
-| `$podId` | `string` | Pod the inbox belongs to |
-| `$displayName` | `?string` | Display name string |
-| `$clientId` | `?string` | Client identifier |
-| `$createdAt` | `Carbon` | Creation timestamp |
-| `$updatedAt` | `Carbon` | Last updated timestamp |
+| Property       | Type      | Description              |
+| -------------- | --------- | ------------------------ |
+| `$inboxId`     | `string`  | Unique inbox identifier  |
+| `$podId`       | `string`  | Pod the inbox belongs to |
+| `$displayName` | `?string` | Display name string      |
+| `$clientId`    | `?string` | Client identifier        |
+| `$createdAt`   | `Carbon`  | Creation timestamp       |
+| `$updatedAt`   | `Carbon`  | Last updated timestamp   |
 
 ### The `InboxCollection` DTO
 
 `Agentmail::inboxes()->list()` returns an `InboxCollection` with the following properties:
 
-| Property | Type | Description |
-|---|---|---|
-| `$inboxes` | `Collection<Inbox>` | List of inbox objects |
-| `$count` | `int` | Number of inboxes returned |
-| `$limit` | `?int` | Page size limit used |
-| `$nextPageToken` | `?string` | Token to fetch the next page, or `null` if on the last page |
+| Property         | Type                | Description                                                 |
+| ---------------- | ------------------- | ----------------------------------------------------------- |
+| `$inboxes`       | `Collection<Inbox>` | List of inbox objects                                       |
+| `$count`         | `int`               | Number of inboxes returned                                  |
+| `$limit`         | `?int`              | Page size limit used                                        |
+| `$nextPageToken` | `?string`           | Token to fetch the next page, or `null` if on the last page |
 
 ## Error Handling
 
@@ -185,4 +185,4 @@ expect($collection->count)->toBe(1);
 
 ## License
 
-MIT
+[MIT](https://opensource.org/license/MIT)

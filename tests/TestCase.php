@@ -1,5 +1,4 @@
 <?php
-
 namespace Polkachu\LaravelAgentmail\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;

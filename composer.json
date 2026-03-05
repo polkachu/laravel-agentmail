@@ -1,53 +1,53 @@
 {
-    "name": "polkachu/laravel-agentmail",
-    "description": "A Laravel package for Agentmail API integration",
-    "type": "library",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Polkachu Intern",
-            "email": "hello@polkachu.com"
-        }
-    ],
-    "require": {
-        "php": "^8.1",
-        "illuminate/http": "^10.0|^11.0|^12.0",
-        "illuminate/support": "^10.0|^11.0|^12.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0|^10.0",
-        "pestphp/pest": "^2.0",
-        "pestphp/pest-plugin-laravel": "^2.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Polkachu\\LaravelAgentmail\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Polkachu\\LaravelAgentmail\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Polkachu\\LaravelAgentmail\\AgentmailServiceProvider"
-            ],
-            "aliases": {
-                "Agentmail": "Polkachu\\LaravelAgentmail\\Facades\\Agentmail"
-            }
-        }
-    },
-    "scripts": {
-        "test": "vendor/bin/pest"
-    },
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "polkachu/laravel-agentmail",
+  "description": "A Laravel package for Agentmail API integration",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Polkachu Intern",
+      "email": "hello@polkachu.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "illuminate/http": "^10.0|^11.0|^12.0",
+    "illuminate/support": "^10.0|^11.0|^12.0"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^8.0|^9.0|^10.0",
+    "pestphp/pest": "^2.0",
+    "pestphp/pest-plugin-laravel": "^2.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Polkachu\\LaravelAgentmail\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Polkachu\\LaravelAgentmail\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Polkachu\\LaravelAgentmail\\AgentmailServiceProvider"
+      ],
+      "aliases": {
+        "Agentmail": "Polkachu\\LaravelAgentmail\\Facades\\Agentmail"
+      }
+    }
+  },
+  "scripts": {
+    "test": "vendor/bin/pest"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

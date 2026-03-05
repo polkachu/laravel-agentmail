@@ -9,21 +9,21 @@ use Polkachu\LaravelAgentmail\Facades\Agentmail;
 function fakeInbox(array $overrides = []): array
 {
     return array_merge([
-        'pod_id' => 'pod_123',
-        'inbox_id' => 'inbox_abc',
+        'pod_id'       => 'pod_123',
+        'inbox_id'     => 'inbox_abc',
         'display_name' => 'Support <support@agentmail.to>',
-        'client_id' => 'client_xyz',
-        'created_at' => '2024-01-01T00:00:00Z',
-        'updated_at' => '2024-01-02T00:00:00Z',
+        'client_id'    => 'client_xyz',
+        'created_at'   => '2024-01-01T00:00:00Z',
+        'updated_at'   => '2024-01-02T00:00:00Z',
     ], $overrides);
 }
 
 it('can list inboxes', function () {
     Http::fake([
         '*/v0/inboxes*' => Http::response([
-            'count' => 2,
-            'inboxes' => [fakeInbox(['inbox_id' => 'inbox_1']), fakeInbox(['inbox_id' => 'inbox_2'])],
-            'limit' => 50,
+            'count'           => 2,
+            'inboxes'         => [fakeInbox(['inbox_id' => 'inbox_1']), fakeInbox(['inbox_id' => 'inbox_2'])],
+            'limit'           => 50,
             'next_page_token' => null,
         ]),
     ]);
@@ -40,7 +40,7 @@ it('can list inboxes', function () {
 it('passes limit and page_token when listing inboxes', function () {
     Http::fake([
         '*/v0/inboxes*' => Http::response([
-            'count' => 1,
+            'count'   => 1,
             'inboxes' => [fakeInbox()],
         ]),
     ]);
@@ -49,7 +49,7 @@ it('passes limit and page_token when listing inboxes', function () {
 
     Http::assertSent(function ($request) {
         return str_contains($request->url(), 'limit=10')
-            && str_contains($request->url(), 'page_token=tok_abc');
+        && str_contains($request->url(), 'page_token=tok_abc');
     });
 });
 
@@ -71,9 +71,9 @@ it('can create an inbox', function () {
 
     Http::assertSent(function ($request) {
         return $request->method() === 'POST'
-            && str_contains($request->url(), '/v0/inboxes')
-            && $request->data()['username'] === 'support'
-            && $request->data()['display_name'] === 'Support Team';
+        && str_contains($request->url(), '/v0/inboxes')
+        && $request->data()['username'] === 'support'
+        && $request->data()['display_name'] === 'Support Team';
     });
 });
 
@@ -89,7 +89,7 @@ it('can get an inbox', function () {
 
     Http::assertSent(function ($request) {
         return $request->method() === 'GET'
-            && str_contains($request->url(), '/v0/inboxes/inbox_abc');
+        && str_contains($request->url(), '/v0/inboxes/inbox_abc');
     });
 });
 
@@ -105,8 +105,8 @@ it('can update an inbox', function () {
 
     Http::assertSent(function ($request) {
         return $request->method() === 'PATCH'
-            && str_contains($request->url(), '/v0/inboxes/inbox_abc')
-            && $request->data()['display_name'] === 'New Name';
+        && str_contains($request->url(), '/v0/inboxes/inbox_abc')
+        && $request->data()['display_name'] === 'New Name';
     });
 });
 
@@ -121,14 +121,14 @@ it('can delete an inbox', function () {
 
     Http::assertSent(function ($request) {
         return $request->method() === 'DELETE'
-            && str_contains($request->url(), '/v0/inboxes/inbox_abc');
+        && str_contains($request->url(), '/v0/inboxes/inbox_abc');
     });
 });
 
 it('throws AgentmailException on 404 response', function () {
     Http::fake([
         '*/v0/inboxes/*' => Http::response([
-            'name' => 'NotFoundError',
+            'name'    => 'NotFoundError',
             'message' => 'Inbox not found.',
         ], 404),
     ]);
@@ -139,7 +139,7 @@ it('throws AgentmailException on 404 response', function () {
 it('throws AgentmailException on 400 response', function () {
     Http::fake([
         '*/v0/inboxes' => Http::response([
-            'name' => 'ValidationError',
+            'name'    => 'ValidationError',
             'message' => 'Invalid username.',
         ], 400),
     ]);
