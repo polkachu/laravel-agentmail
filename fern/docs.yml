@@ -1,5 +1,6 @@
 instances:
   - url: polkachu.docs.buildwithfern.com
+    custom-domain: agentmail.polkachu.com
 
 title: Laravel AgentMail
 
