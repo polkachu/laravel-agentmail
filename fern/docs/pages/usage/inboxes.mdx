@@ -1,0 +1,134 @@
+# Inboxes
+
+All inbox operations are accessed via `Agentmail::inboxes()`. Each method returns a typed DTO.
+
+```php
+use Polkachu\LaravelAgentmail\Facades\Agentmail;
+```
+
+---
+
+## List inboxes
+
+Returns an `InboxCollection` containing a Laravel `Collection` of `Inbox` objects.
+
+```php
+$collection = Agentmail::inboxes()->list();
+
+foreach ($collection->inboxes as $inbox) {
+    echo $inbox->inboxId;
+}
+```
+
+### Pagination
+
+Pass `limit` to control page size and `pageToken` to advance through pages:
+
+```php
+$collection = Agentmail::inboxes()->list(limit: 20);
+
+if ($collection->nextPageToken) {
+    $nextPage = Agentmail::inboxes()->list(limit: 20, pageToken: $collection->nextPageToken);
+}
+```
+
+### `InboxCollection` properties
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `$inboxes` | `Collection<Inbox>` | The inboxes on the current page |
+| `$count` | `int` | Number of inboxes returned |
+| `$limit` | `?int` | Page size limit used |
+| `$nextPageToken` | `?string` | Cursor for the next page, or `null` on the last page |
+
+---
+
+## Create an inbox
+
+All parameters are optional. AgentMail will generate a random username if one is not provided.
+
+```php
+$inbox = Agentmail::inboxes()->create(
+    username: 'support',
+    domain: 'agentmail.to',
+    displayName: 'Support Agent',
+    clientId: 'my-app-client-id',
+);
+
+echo $inbox->inboxId;     // e.g. "inbox_abc123"
+echo $inbox->displayName; // e.g. "Support Agent <support@agentmail.to>"
+```
+
+---
+
+## Get an inbox
+
+```php
+$inbox = Agentmail::inboxes()->get('inbox_abc123');
+
+echo $inbox->inboxId;
+echo $inbox->podId;
+echo $inbox->createdAt->toDateTimeString();
+```
+
+---
+
+## Update an inbox
+
+Only the display name can be updated.
+
+```php
+$inbox = Agentmail::inboxes()->update('inbox_abc123', 'New Name <support@agentmail.to>');
+```
+
+---
+
+## Delete an inbox
+
+```php
+Agentmail::inboxes()->delete('inbox_abc123');
+```
+
+Returns `true` on success.
+
+---
+
+## The `Inbox` DTO
+
+All single-inbox operations return an `Inbox` object:
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `$inboxId` | `string` | Unique inbox identifier |
+| `$podId` | `string` | Pod the inbox belongs to |
+| `$displayName` | `?string` | Display name string |
+| `$clientId` | `?string` | Client identifier |
+| `$createdAt` | `Carbon` | Creation timestamp |
+| `$updatedAt` | `Carbon` | Last updated timestamp |
+
+---
+
+## Testing
+
+Use Laravel's `Http::fake()` to mock AgentMail responses without making real API calls:
+
+```php
+use Illuminate\Support\Facades\Http;
+use Polkachu\LaravelAgentmail\Facades\Agentmail;
+
+Http::fake([
+    '*/v0/inboxes*' => Http::response([
+        'count' => 1,
+        'inboxes' => [[
+            'inbox_id'   => 'inbox_abc',
+            'pod_id'     => 'pod_123',
+            'created_at' => '2024-01-01T00:00:00Z',
+            'updated_at' => '2024-01-02T00:00:00Z',
+        ]],
+    ]),
+]);
+
+$collection = Agentmail::inboxes()->list();
+
+expect($collection->count)->toBe(1);
+```

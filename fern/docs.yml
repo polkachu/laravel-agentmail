@@ -1,0 +1,26 @@
+instances:
+  - url: polkachu.docs.buildwithfern.com
+
+title: Laravel AgentMail
+
+navigation:
+  - section: Getting Started
+    contents:
+      - page: Introduction
+        path: ./docs/pages/introduction.mdx
+      - page: Installation
+        path: ./docs/pages/installation.mdx
+      - page: Configuration
+        path: ./docs/pages/configuration.mdx
+  - section: Usage
+    contents:
+      - page: Inboxes
+        path: ./docs/pages/usage/inboxes.mdx
+      - page: Error Handling
+        path: ./docs/pages/usage/error-handling.mdx
+  - api: API Reference
+
+colors:
+  accentPrimary:
+    dark: "#7C3AED"
+    light: "#7C3AED"
