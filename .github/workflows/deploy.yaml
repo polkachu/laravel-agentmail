@@ -4,6 +4,9 @@ on:
     push:
         branches:
             - master
+        paths:
+            - 'docusaurus/**'
+            - '.github/workflows/deploy.yml'
 
 concurrency:
     group: deploy-docusaurus-master
