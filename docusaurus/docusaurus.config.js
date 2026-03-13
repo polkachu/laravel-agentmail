@@ -31,7 +31,7 @@ const config = {
         specs: [
           {
             id: 'agentmail-api',
-            spec: '../fern/openapi/openapi.yaml',
+            spec: './openapi/openapi.yaml',
             route: '/api',
           },
         ],

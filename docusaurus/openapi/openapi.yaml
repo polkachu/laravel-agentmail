@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: AgentMail API
+  description: Programmatic email inboxes for AI agents
+  version: 0.0.0
+  contact:
+    url: https://agentmail.to
+servers:
+  - url: https://api.agentmail.to
+    description: Production
+
+security:
+  - bearerAuth: []
+
+paths:
+  /v0/inboxes:
+    get:
+      operationId: listInboxes
+      summary: List inboxes
+      description: Returns a paginated list of inboxes for the authenticated account.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of inboxes to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: page_token
+          in: query
+          description: Pagination token returned from a previous list call.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A paginated list of inboxes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboxCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+    post:
+      operationId: createInbox
+      summary: Create an inbox
+      description: Creates a new email inbox.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateInboxRequest'
+      responses:
+        '201':
+          description: The newly created inbox.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /v0/inboxes/{inbox_id}:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+
+    get:
+      operationId: getInbox
+      summary: Get an inbox
+      description: Retrieves a single inbox by ID.
+      responses:
+        '200':
+          description: The requested inbox.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateInbox
+      summary: Update an inbox
+      description: Updates the display name of an existing inbox.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateInboxRequest'
+      responses:
+        '200':
+          description: The updated inbox.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Inbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+    delete:
+      operationId: deleteInbox
+      summary: Delete an inbox
+      description: Permanently deletes an inbox and all its messages.
+      responses:
+        '204':
+          description: Inbox deleted successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key issued by AgentMail.
+
+  schemas:
+    Inbox:
+      type: object
+      required:
+        - pod_id
+        - inbox_id
+        - updated_at
+        - created_at
+      properties:
+        pod_id:
+          type: string
+          description: The pod that owns this inbox.
+          example: pod_abc123
+        inbox_id:
+          type: string
+          description: The unique identifier of the inbox.
+          example: inbox_xyz789
+        display_name:
+          type: string
+          nullable: true
+          description: Human-readable label for the inbox.
+          example: Support Team
+        client_id:
+          type: string
+          nullable: true
+          description: Optional client-supplied identifier for correlation.
+          example: client_007
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the inbox was created.
+          example: '2024-01-15T10:30:00Z'
+        updated_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the inbox was last updated.
+          example: '2024-01-15T12:00:00Z'
+
+    InboxCollection:
+      type: object
+      required:
+        - inboxes
+        - count
+      properties:
+        inboxes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Inbox'
+        count:
+          type: integer
+          description: Total number of inboxes matching the query.
+          example: 42
+        limit:
+          type: integer
+          nullable: true
+          description: The limit applied to this page.
+          example: 20
+        next_page_token:
+          type: string
+          nullable: true
+          description: Token to retrieve the next page, or null if this is the last page.
+          example: tok_nextpage
+
+    CreateInboxRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Local part of the email address (before the @). Auto-generated if omitted.
+          example: support
+        domain:
+          type: string
+          description: Domain for the email address. Defaults to the account default domain.
+          example: agentmail.to
+        display_name:
+          type: string
+          description: Human-readable label for the inbox.
+          example: Support Team
+        client_id:
+          type: string
+          description: Optional client-supplied identifier for correlation.
+          example: client_007
+
+    UpdateInboxRequest:
+      type: object
+      required:
+        - display_name
+      properties:
+        display_name:
+          type: string
+          description: New display name for the inbox.
+          example: 'New Name <support@agentmail.to>'
+
+    ApiError:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Machine-readable error code.
+          example: not_found
+        message:
+          type: string
+          description: Human-readable error description.
+          example: Inbox not found.
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid API key.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: The requested resource does not exist.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnprocessableEntity:
+      description: Validation error — the request body is invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
