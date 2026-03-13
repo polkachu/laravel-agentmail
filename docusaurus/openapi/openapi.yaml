@@ -128,6 +128,290 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /v0/inboxes/{inbox_id}/messages:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+
+    get:
+      operationId: listMessages
+      summary: List messages
+      description: Returns a paginated list of messages in the inbox.
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of messages to return.
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: page_token
+          in: query
+          description: Pagination token returned from a previous list call.
+          required: false
+          schema:
+            type: string
+        - name: labels
+          in: query
+          description: Filter messages by labels.
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: before
+          in: query
+          description: Return messages before this ISO 8601 timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: after
+          in: query
+          description: Return messages after this ISO 8601 timestamp.
+          required: false
+          schema:
+            type: string
+            format: date-time
+        - name: ascending
+          in: query
+          description: Sort in ascending order (oldest first). Defaults to descending.
+          required: false
+          schema:
+            type: boolean
+        - name: include_spam
+          in: query
+          description: Include messages marked as spam.
+          required: false
+          schema:
+            type: boolean
+        - name: include_blocked
+          in: query
+          description: Include messages that were blocked.
+          required: false
+          schema:
+            type: boolean
+        - name: include_trash
+          in: query
+          description: Include messages in the trash.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: A paginated list of messages.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageCollection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+    post:
+      operationId: sendMessage
+      summary: Send a message
+      description: Sends an email from the inbox.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '201':
+          description: The sent message reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /v0/inboxes/{inbox_id}/messages/{message_id}:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: path
+        description: The unique identifier of the message.
+        required: true
+        schema:
+          type: string
+
+    get:
+      operationId: getMessage
+      summary: Get a message
+      description: Retrieves a single message by ID.
+      responses:
+        '200':
+          description: The requested message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      operationId: updateMessage
+      summary: Update a message
+      description: Adds or removes labels on a message.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMessageRequest'
+      responses:
+        '200':
+          description: The updated message.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /v0/inboxes/{inbox_id}/messages/{message_id}/reply:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: path
+        description: The unique identifier of the message to reply to.
+        required: true
+        schema:
+          type: string
+
+    post:
+      operationId: replyToMessage
+      summary: Reply to a message
+      description: Sends a reply to an existing message.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyMessageRequest'
+      responses:
+        '201':
+          description: The sent reply reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /v0/inboxes/{inbox_id}/messages/{message_id}/reply-all:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: path
+        description: The unique identifier of the message to reply-all to.
+        required: true
+        schema:
+          type: string
+
+    post:
+      operationId: replyAllToMessage
+      summary: Reply all to a message
+      description: Sends a reply to all recipients of an existing message.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplyMessageRequest'
+      responses:
+        '201':
+          description: The sent reply-all reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /v0/inboxes/{inbox_id}/messages/{message_id}/forward:
+    parameters:
+      - name: inbox_id
+        in: path
+        description: The unique identifier of the inbox.
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: path
+        description: The unique identifier of the message to forward.
+        required: true
+        schema:
+          type: string
+
+    post:
+      operationId: forwardMessage
+      summary: Forward a message
+      description: Forwards an existing message to new recipients.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForwardMessageRequest'
+      responses:
+        '201':
+          description: The forwarded message reference.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -227,6 +511,398 @@ components:
           type: string
           description: New display name for the inbox.
           example: 'New Name <support@agentmail.to>'
+
+    Attachment:
+      type: object
+      required:
+        - attachment_id
+        - size
+      properties:
+        attachment_id:
+          type: string
+          description: The unique identifier of the attachment.
+          example: att_abc123
+        size:
+          type: integer
+          description: Size of the attachment in bytes.
+          example: 20480
+        filename:
+          type: string
+          nullable: true
+          description: Original filename of the attachment.
+          example: report.pdf
+        content_type:
+          type: string
+          nullable: true
+          description: MIME type of the attachment.
+          example: application/pdf
+        content_disposition:
+          type: string
+          nullable: true
+          description: Content-Disposition header value.
+          example: attachment; filename="report.pdf"
+        content_id:
+          type: string
+          nullable: true
+          description: Content-ID for inline attachments.
+          example: '<image001@example.com>'
+
+    Message:
+      type: object
+      required:
+        - inbox_id
+        - thread_id
+        - message_id
+        - labels
+        - timestamp
+        - from
+        - to
+        - size
+        - updated_at
+        - created_at
+      properties:
+        inbox_id:
+          type: string
+          description: The inbox this message belongs to.
+          example: inbox_xyz789
+        thread_id:
+          type: string
+          description: The thread this message belongs to.
+          example: thread_abc123
+        message_id:
+          type: string
+          description: The unique identifier of the message.
+          example: msg_def456
+        labels:
+          type: array
+          items:
+            type: string
+          description: Labels applied to the message.
+          example: ['inbox', 'unread']
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the message was sent.
+          example: '2024-01-15T10:30:00Z'
+        from:
+          type: string
+          description: Sender email address.
+          example: sender@example.com
+        to:
+          type: array
+          items:
+            type: string
+          description: Recipient email addresses.
+          example: ['recipient@example.com']
+        size:
+          type: integer
+          description: Size of the message in bytes.
+          example: 4096
+        updated_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the message was last updated.
+          example: '2024-01-15T12:00:00Z'
+        created_at:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the message was created.
+          example: '2024-01-15T10:30:00Z'
+        cc:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: CC recipient email addresses.
+          example: ['cc@example.com']
+        bcc:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: BCC recipient email addresses.
+        reply_to:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: Reply-To email addresses.
+        subject:
+          type: string
+          nullable: true
+          description: Subject of the message.
+          example: Hello from AgentMail
+        preview:
+          type: string
+          nullable: true
+          description: Short preview snippet of the message body.
+          example: Just checking in...
+        text:
+          type: string
+          nullable: true
+          description: Plain-text body of the message.
+        html:
+          type: string
+          nullable: true
+          description: HTML body of the message.
+        extracted_text:
+          type: string
+          nullable: true
+          description: Extracted plain-text content (stripped of quoted replies).
+        extracted_html:
+          type: string
+          nullable: true
+          description: Extracted HTML content (stripped of quoted replies).
+        in_reply_to:
+          type: string
+          nullable: true
+          description: Message-ID of the message this is a reply to.
+        references:
+          type: array
+          items:
+            type: string
+          nullable: true
+          description: List of Message-IDs in the thread ancestry.
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attachment'
+          nullable: true
+          description: Attachments included in the message.
+        headers:
+          type: object
+          nullable: true
+          additionalProperties:
+            type: string
+          description: Additional email headers as key-value pairs.
+
+    MessageCollection:
+      type: object
+      required:
+        - messages
+        - count
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        count:
+          type: integer
+          description: Total number of messages matching the query.
+          example: 42
+        limit:
+          type: integer
+          nullable: true
+          description: The limit applied to this page.
+          example: 20
+        next_page_token:
+          type: string
+          nullable: true
+          description: Token to retrieve the next page, or null if this is the last page.
+          example: tok_nextpage
+
+    SendMessageRequest:
+      type: object
+      properties:
+        to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Recipient email address(es).
+          example: recipient@example.com
+        cc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: CC recipient email address(es).
+          nullable: true
+        bcc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: BCC recipient email address(es).
+          nullable: true
+        subject:
+          type: string
+          description: Subject of the message.
+          example: Hello from AgentMail
+        text:
+          type: string
+          description: Plain-text body.
+        html:
+          type: string
+          description: HTML body.
+        reply_to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Reply-To email address(es).
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: string
+          description: Labels to apply to the sent message.
+          nullable: true
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Additional email headers.
+          nullable: true
+
+    SendMessageResponse:
+      type: object
+      required:
+        - message_id
+        - thread_id
+      properties:
+        message_id:
+          type: string
+          description: The unique identifier of the sent message.
+          example: msg_def456
+        thread_id:
+          type: string
+          description: The thread the message belongs to.
+          example: thread_abc123
+
+    UpdateMessageRequest:
+      type: object
+      properties:
+        add_labels:
+          type: array
+          items:
+            type: string
+          description: Labels to add to the message.
+          nullable: true
+          example: ['read']
+        remove_labels:
+          type: array
+          items:
+            type: string
+          description: Labels to remove from the message.
+          nullable: true
+          example: ['unread']
+
+    ReplyMessageRequest:
+      type: object
+      properties:
+        to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Override recipient email address(es).
+          nullable: true
+        cc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: CC recipient email address(es).
+          nullable: true
+        bcc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: BCC recipient email address(es).
+          nullable: true
+        text:
+          type: string
+          description: Plain-text body of the reply.
+        html:
+          type: string
+          description: HTML body of the reply.
+        reply_to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Reply-To email address(es).
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: string
+          description: Labels to apply to the reply.
+          nullable: true
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Additional email headers.
+          nullable: true
+
+    ForwardMessageRequest:
+      type: object
+      properties:
+        to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Recipient email address(es) to forward to.
+          nullable: true
+        cc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: CC recipient email address(es).
+          nullable: true
+        bcc:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: BCC recipient email address(es).
+          nullable: true
+        subject:
+          type: string
+          description: Override subject for the forwarded message.
+          nullable: true
+        text:
+          type: string
+          description: Additional plain-text body prepended to the forwarded content.
+        html:
+          type: string
+          description: Additional HTML body prepended to the forwarded content.
+        reply_to:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Reply-To email address(es).
+          nullable: true
+        labels:
+          type: array
+          items:
+            type: string
+          description: Labels to apply to the forwarded message.
+          nullable: true
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+          description: Additional email headers.
+          nullable: true
 
     ApiError:
       type: object
