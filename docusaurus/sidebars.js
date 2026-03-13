@@ -9,7 +9,7 @@ const sidebars = {
     {
       type: 'category',
       label: 'Usage',
-      items: ['usage/inboxes', 'usage/error-handling'],
+      items: ['usage/inboxes', 'usage/messages', 'usage/error-handling'],
     },
   ],
 };
