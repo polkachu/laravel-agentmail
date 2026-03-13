@@ -2,11 +2,25 @@ name: Deploy docusaurus site
 
 on:
     push:
-        branches: [master]
+        branches:
+            - master
+
+concurrency:
+    group: deploy-docusaurus-master
+    cancel-in-progress: true
 
 jobs:
     deploy:
         runs-on: ubuntu-latest
+        timeout-minutes: 15
+
+        permissions:
+            contents: read
+
+        defaults:
+            run:
+                shell: bash
+                working-directory: docusaurus
 
         steps:
             - name: Checkout repo
@@ -21,20 +35,40 @@ jobs:
 
             - name: Install deps
               run: npm ci
-              working-directory: docusaurus
 
             - name: Build site
               run: npm run build
-              working-directory: docusaurus
 
-            - name: Add SSH key
+            - name: Configure SSH
+              working-directory: .
+              env:
+                  VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_PORT: ${{ secrets.VPS_PORT }}
               run: |
+                  set -euo pipefail
                   mkdir -p ~/.ssh
-                  echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_rsa
+                  printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_rsa
                   chmod 600 ~/.ssh/id_rsa
-                  ssh-keyscan -H -p ${{ secrets.VPS_PORT }} ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+                  ssh-keyscan -p "$VPS_PORT" -H "$VPS_HOST" >> ~/.ssh/known_hosts
 
             - name: Deploy files
+              working-directory: .
+              env:
+                  VPS_HOST: ${{ secrets.VPS_HOST }}
+                  VPS_PORT: ${{ secrets.VPS_PORT }}
+                  VPS_USER: ${{ secrets.VPS_USER }}
               run: |
-                  rsync -avz --delete -e "ssh -p ${{ secrets.VPS_PORT }}" docusaurus/build/ \
-                    ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/sites/agentmail
+                  set -euo pipefail
+                  rsync -az --delete \
+                    --omit-dir-times \
+                    --no-perms \
+                    --no-owner \
+                    --no-group \
+                    -e "ssh -p $VPS_PORT -i ~/.ssh/id_rsa" \
+                    docusaurus/build/ \
+                    "$VPS_USER@$VPS_HOST:/home/ubuntu/sites/agentmail/"
+
+            - name: Verify deployed site
+              working-directory: .
+              run: curl -fsS https://agentmail.polkachu.com/ >/dev/null
