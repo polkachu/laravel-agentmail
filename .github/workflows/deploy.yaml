@@ -37,4 +37,4 @@ jobs:
             - name: Deploy files
               run: |
                   rsync -avz --delete -e "ssh -p ${{ secrets.VPS_PORT }}" docusaurus/build/ \
-                    ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/var/www/mydocs/
+                    ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/ubuntu/sites/agentmail
