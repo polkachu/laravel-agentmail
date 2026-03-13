@@ -3,7 +3,7 @@ sidebar_position: 3
 title: Configuration
 ---
 
-# Configuration
+# Configuration update
 
 ## Environment variables
 
