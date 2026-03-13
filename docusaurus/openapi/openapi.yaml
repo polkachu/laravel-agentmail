@@ -12,9 +12,16 @@ servers:
 security:
   - bearerAuth: []
 
+tags:
+  - name: Inboxes
+    description: Create and manage email inboxes.
+  - name: Messages
+    description: Send, receive, and manage messages within an inbox.
+
 paths:
   /v0/inboxes:
     get:
+      tags: [Inboxes]
       operationId: listInboxes
       summary: List inboxes
       description: Returns a paginated list of inboxes for the authenticated account.
@@ -46,6 +53,7 @@ paths:
           $ref: '#/components/responses/UnprocessableEntity'
 
     post:
+      tags: [Inboxes]
       operationId: createInbox
       summary: Create an inbox
       description: Creates a new email inbox.
@@ -77,6 +85,7 @@ paths:
           type: string
 
     get:
+      tags: [Inboxes]
       operationId: getInbox
       summary: Get an inbox
       description: Retrieves a single inbox by ID.
@@ -93,6 +102,7 @@ paths:
           $ref: '#/components/responses/NotFound'
 
     patch:
+      tags: [Inboxes]
       operationId: updateInbox
       summary: Update an inbox
       description: Updates the display name of an existing inbox.
@@ -117,6 +127,7 @@ paths:
           $ref: '#/components/responses/UnprocessableEntity'
 
     delete:
+      tags: [Inboxes]
       operationId: deleteInbox
       summary: Delete an inbox
       description: Permanently deletes an inbox and all its messages.
@@ -138,6 +149,7 @@ paths:
           type: string
 
     get:
+      tags: [Messages]
       operationId: listMessages
       summary: List messages
       description: Returns a paginated list of messages in the inbox.
@@ -217,6 +229,7 @@ paths:
           $ref: '#/components/responses/UnprocessableEntity'
 
     post:
+      tags: [Messages]
       operationId: sendMessage
       summary: Send a message
       description: Sends an email from the inbox.
@@ -256,6 +269,7 @@ paths:
           type: string
 
     get:
+      tags: [Messages]
       operationId: getMessage
       summary: Get a message
       description: Retrieves a single message by ID.
@@ -272,6 +286,7 @@ paths:
           $ref: '#/components/responses/NotFound'
 
     patch:
+      tags: [Messages]
       operationId: updateMessage
       summary: Update a message
       description: Adds or removes labels on a message.
@@ -311,6 +326,7 @@ paths:
           type: string
 
     post:
+      tags: [Messages]
       operationId: replyToMessage
       summary: Reply to a message
       description: Sends a reply to an existing message.
@@ -350,6 +366,7 @@ paths:
           type: string
 
     post:
+      tags: [Messages]
       operationId: replyAllToMessage
       summary: Reply all to a message
       description: Sends a reply to all recipients of an existing message.
@@ -389,6 +406,7 @@ paths:
           type: string
 
     post:
+      tags: [Messages]
       operationId: forwardMessage
       summary: Forward a message
       description: Forwards an existing message to new recipients.
